@@ -32,8 +32,9 @@ WheelD = 62        # Wheel diameter in mm
 Axle = 170         # Axle length (distance between wheels) in mm
 
 # --------- Motor Control ---------
-LoopTime = 10      # Control loop time in milliseconds (update frequency)
-MaxAcc = 30000    # Maximum acceleration in degrees per second squared
+LoopTime = 10      # Control loop time in milliseconds (update frequency). 
+                   # On Lego's website, they state that the update frequency of Spike Prime is 100hz so this is quite the minimum LoopTime possible. 
+MaxAcc = 30000     # Maximum acceleration in degrees per second squared
 MinSpeed = 200     # Minimum motor speed in degrees per second
 MaxSpeed = 1350    # Maximum motor speed in degrees per second
 
@@ -597,10 +598,13 @@ async def Stop():
     timer.reset()
     
     # Apply brakes for 40ms to smoothly stop
+    # Use waiting times that are multiples of your LoopTime so that the updated Odometry values during braking will have minimal error. 
+    
     while timer.time() < 40:
         OdomUpdate()  # Update odometry during stop
         LeftMotor.brake()
         RightMotor.brake() 
+        await wait(LoopTime)   
     # Finally hold position
     LeftMotor.hold()
     RightMotor.hold()
